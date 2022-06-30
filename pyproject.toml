@@ -36,8 +36,20 @@ python_files = [
 [tool.poetry]
 name = "yaml-pipe"
 version = "0.1.0"
-description = ""
+description = "Parse yaml"
 authors = ["pollenjp <polleninjp@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/pollenjp/yaml-pipe"
+classifiers = []
+
+packages = [
+    { include = "yaml_pipe", from = "src" },
+]
+
+[tool.poetry.scripts]
+yaml-pipe = "yaml_pipe.main:main"
+
 
 [tool.poetry.dependencies]
 python = "^3.10"
