@@ -26,7 +26,7 @@ addopts = [
     # "--cov-append",
     # "--cov-report=term-missing",
 ]
-testpaths = "tests"
+testpaths = "test"
 python_files = [
     "tests.py",
     "test_*.py",
@@ -48,12 +48,13 @@ packages = [
 ]
 
 [tool.poetry.scripts]
-yaml-pipe = "yaml_pipe.main:main"
+yaml-pipe = "yaml_pipe.cli:main"
 
 
 [tool.poetry.dependencies]
 python = "^3.10"
 omegaconf = "^2.2.2"
+PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
@@ -64,6 +65,7 @@ mypy = "^0.961"
 nox = "^2022.1.7"
 pytest = "^7.1.2"
 types-PyYAML = "^6.0.9"
+pydantic = "^1.9.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
