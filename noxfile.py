@@ -10,15 +10,13 @@ import nox
 from nox.sessions import Session
 
 python_code_path_list: List[str] = [
-    "path/to/python/directory",  # TODO: python directory
+    "src",
     "noxfile.py",
 ]
 assert all(isinstance(path, str) for path in python_code_path_list)
-env_common: Dict[str, str] = {
-    "PYTHONPATH": f"{Path(__file__).parent}",  # TODO: check python path
-}
+env_common: Dict[str, str] = {"PYTHONPATH": f"{Path(__file__).parent / 'src'}"}
 nox_tmp_dir: Path = Path(__file__).parent / ".nox_tmp"
-python_version_list: List[str] = ["3.10"]  # TODO: check python version
+python_version_list: List[str] = ["3.10"]
 
 
 class SessionKwargs(TypedDict, total=False):
