@@ -43,7 +43,7 @@ pip install yaml-pipe
 
 ### example1
 
-`sample.yml'
+`sample.yml`
 
 ```yml
 ---
@@ -65,7 +65,7 @@ foo:
 
 ### example2
 
-`sample.yml'
+`sample.yml`
 
 ```yaml
 ---
@@ -77,7 +77,7 @@ fizz:
 ````
 
 ```sh
-cat sample.yml | yaml-pipe --block_id 2 fizz.buzz="buzz"
+cat sample.yml | yaml-pipe --block_id 1 fizz.buzz="buzz"
 ```
 
 output
