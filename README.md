@@ -57,7 +57,7 @@ cat sample.yml | yaml-pipe foo.bar="bar"
 
 output
 
-```txt
+```yaml
 ---
 foo:
   bar: bar
