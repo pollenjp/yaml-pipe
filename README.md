@@ -1,6 +1,12 @@
 # yaml-pipe
 
-## Behavior
+## Install
+
+```sh
+pip install yaml-pipe
+```
+
+## How to use
 
 ### example1
 
@@ -9,11 +15,11 @@
 ```yml
 ---
 foo:
-  bar: Hello
+  bar: BAR
 ````
 
 ```sh
-cat sample.yml | yamlpipe foo.bar="World" | cat
+cat sample.yml | yaml-pipe foo.bar="bar"
 ```
 
 output
@@ -21,5 +27,33 @@ output
 ```txt
 ---
 foo:
-  bar: World
+  bar: bar
+```
+
+### example2
+
+`sample.yml'
+
+```yaml
+---
+foo:
+  bar: BAR
+---
+fizz:
+  buzz: BUZZ
+````
+
+```sh
+cat sample.yml | yaml-pipe --block_id 2 fizz.buzz="buzz"
+```
+
+output
+
+```yaml
+---
+foo:
+  bar: BAR
+---
+fizz:
+  buzz: buzz
 ```
