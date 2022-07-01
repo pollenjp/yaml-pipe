@@ -1,29 +1,18 @@
-# template-python-poetry
+# yaml-pipe
 
-## Steps
+## Expected Behavior
+
+```yml
+---
+foo:
+  bar: Hello
+````
 
 ```sh
-poetry init
+cat sample.yml | yamlpipe foo.bar="World" | cat
 ```
 
-```sh
-poetry add --dev \
-    black \
-    flake8 \
-    autoflake8 \
-    isort \
-    mypy \
-    nox \
-    pytest
+```txt
+foo:
+  bar: World
 ```
-
-check your python version and update some config
-
-- `noxfile.py`
-  - directory
-  - python version
-  - `PYTHONPATH`
-- `pyproject.toml`
-  - mypy's `python_version`
-
-If you use this github template, update `README.md` .
