@@ -1,6 +1,7 @@
 name: Release Drafter (autolabeler)
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
