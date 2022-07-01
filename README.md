@@ -1,6 +1,10 @@
 # yaml-pipe
 
-## Expected Behavior
+## Behavior
+
+### example1
+
+`sample.yml'
 
 ```yml
 ---
@@ -12,7 +16,10 @@ foo:
 cat sample.yml | yamlpipe foo.bar="World" | cat
 ```
 
+output
+
 ```txt
+---
 foo:
   bar: World
 ```
