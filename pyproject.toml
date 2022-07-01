@@ -35,7 +35,7 @@ python_files = [
 
 [tool.poetry]
 name = "yaml-pipe"
-version = "1.0.2"
+version = "1.0.3"
 description = "Parse yaml"
 authors = ["pollenjp <polleninjp@gmail.com>"]
 readme = "README.md"
@@ -52,9 +52,10 @@ yaml-pipe = "yaml_pipe.cli:main"
 
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.8"
 omegaconf = "^2.2.2"
 PyYAML = "^6.0"
+nox-poetry = "^1.0.1"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
