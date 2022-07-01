@@ -28,4 +28,5 @@ pypi-install:
 .PHONY: clean
 clean:
 	-rm -rf dist
-	-poetry run python -m pip uninstall ${PYTHON_PACKAGE_NAME}
+	-poetry run python -m pip uninstall -y ${PYTHON_PACKAGE_NAME}
+	-poetry run python -m pip cache purge
