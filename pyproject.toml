@@ -35,7 +35,7 @@ python_files = [
 
 [tool.poetry]
 name = "yaml-pipe"
-version = "1.0.3"
+version = "1.1.0"
 description = "Parse yaml"
 authors = ["pollenjp <polleninjp@gmail.com>"]
 readme = "README.md"
@@ -55,7 +55,6 @@ yaml-pipe = "yaml_pipe.cli:main"
 python = "^3.8"
 omegaconf = "^2.2.2"
 PyYAML = "^6.0"
-nox-poetry = "^1.0.1"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
@@ -67,6 +66,7 @@ nox = "^2022.1.7"
 pytest = "^7.1.2"
 types-PyYAML = "^6.0.9"
 pydantic = "^1.9.1"
+nox-poetry = "^1.0.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
