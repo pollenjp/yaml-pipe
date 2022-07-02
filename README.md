@@ -16,7 +16,7 @@
   <a href="https://pepy.tech/project/yaml-pipe">
     <img
       alt="Download"
-      src="https://pepy.tech/badge/yaml-pipe"
+      src="https://static.pepy.tech/personalized-badge/yaml-pipe?period=total&units=international_system&left_color=black&right_color=orange&left_text=Downloads"
     />
   </a>
   <a href="https://github.com/psf/black">
