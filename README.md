@@ -16,7 +16,7 @@
   <a href="https://pepy.tech/project/yaml-pipe">
     <img
       alt="Download"
-      src="https://pepy.tech/badge/yaml-pipe"
+      src="https://static.pepy.tech/personalized-badge/yaml-pipe?period=total&units=international_system&left_color=black&right_color=orange&left_text=Downloads"
     />
   </a>
   <a href="https://github.com/psf/black">
@@ -102,4 +102,18 @@ pyenv local 3.10.4 3.9.13 3.8.13
 ```sh
 poetry install
 poetry run nox
+```
+
+### Upload to PyPI
+
+Default target is testpypi.
+
+```sh
+make pypi-upload
+```
+
+If you upload to pypi, set empty to `TEST_PYPI`.
+
+```sh
+make pypi-upload TEST_PYPI=
 ```
