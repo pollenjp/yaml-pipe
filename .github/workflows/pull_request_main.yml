@@ -30,6 +30,7 @@ jobs:
         run: |
           wget -O stoml https://github.com/freshautomations/stoml/releases/download/v0.7.0/stoml_linux_amd64
           chmod +x stoml
+          pwd
           version=$(./stoml pyproject.toml tool.poetry.version)
           echo "::set-output name=version::${version}"
 
