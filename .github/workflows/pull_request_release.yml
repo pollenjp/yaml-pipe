@@ -1,4 +1,4 @@
-name: Release Drafter (autolabeler)
+name: Release Drafter (autolabeler & check release tag)
 
 on:
   workflow_dispatch:
