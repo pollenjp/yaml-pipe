@@ -103,3 +103,17 @@ pyenv local 3.10.4 3.9.13 3.8.13
 poetry install
 poetry run nox
 ```
+
+### Upload to PyPI
+
+Default target is testpypi.
+
+```sh
+make pypi-upload
+```
+
+If you upload to pypi, set empty to `TEST_PYPI`.
+
+```sh
+make pypi-upload TEST_PYPI=
+```
