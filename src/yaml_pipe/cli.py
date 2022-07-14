@@ -108,7 +108,7 @@ def get_argparse() -> argparse.Namespace:
     args_group1 = parser.add_mutually_exclusive_group(required=True)
     args_group1.add_argument("--file", type=lambda x: Path(x), default=None, help="yaml file")
     args_group1.add_argument(
-        "--py",
+        "--dotindex",
         nargs=argparse.REMAINDER,
         help=(
             "Dot and list-index format. e.g. --py 'xxx.yyy[0].zzz: 123'."

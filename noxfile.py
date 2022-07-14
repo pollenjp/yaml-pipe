@@ -10,6 +10,7 @@ from nox_poetry import Session
 
 python_code_path_list: List[str] = [
     "src",
+    "test",
     "noxfile.py",
 ]
 assert all(isinstance(path, str) for path in python_code_path_list)
