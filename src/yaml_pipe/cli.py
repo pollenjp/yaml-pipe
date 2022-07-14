@@ -111,7 +111,7 @@ def get_argparse() -> argparse.Namespace:
         "--dotindex",
         nargs=argparse.REMAINDER,
         help=(
-            "Dot and list-index format. e.g. --py 'xxx.yyy[0].zzz: 123'."
+            "Dot and list-index format. e.g. --dotindex 'xxx.yyy[0].zzz: 123'."
             "Support only view."
             "If each key has a value, update yaml. Otherwise, read yaml."
         ),
@@ -124,9 +124,6 @@ def get_argparse() -> argparse.Namespace:
 
     args, unknown = parser.parse_known_args()
 
-    if args.file is not None and args.omegaconf_args:
-        raise ValueError("--file and omegaconf_args are exclusive.")
-
     assert_unknown_args(unknown)
     return args
 
@@ -135,19 +132,10 @@ def main() -> None:
 
     argparse_args = get_argparse()
 
-    update_yaml: YamlBlock
     yaml_blocks: t.List[YamlBlock]
-    if argparse_args.file is not None:
-        update_yaml = OmegaConf.load(argparse_args.file)
-    elif argparse_args.dotlist:
-        update_yaml = OmegaConf.from_dotlist(argparse_args.dotlist)
-        args = Args(update_yaml=update_yaml, block_id=argparse_args.block_id, yaml_file=argparse_args.file)
-        logger.debug(f"{args=}")
-        yaml_blocks = YamlParser().update(
-            "".join(sys.stdin.readlines()), update_yaml=args.update_yaml, block_id=args.block_id
-        )
-        YamlParser.stdout_yaml(yaml_blocks)
-    elif argparse_args.py:
+
+    # view values
+    if argparse_args.dotindex:
         yaml_blocks = YamlParser.parse_yaml(yaml_str="\n".join(sys.stdin.readlines()))
         yaml_block: YamlBlock
         if len(yaml_blocks) == 1:
@@ -157,7 +145,7 @@ def main() -> None:
                 raise ValueError("Multi block yaml and no block_id specified.")
             yaml_block = yaml_blocks[argparse_args.block_id]
 
-        for dot_key in argparse_args.py:
+        for dot_key in argparse_args.dotindex:
             val: t.Union[str, int, t.List[t.Any], t.Dict[str, t.Any], YamlBlock] = YamlParser.extract_value(
                 yaml_block, dot_key
             )
@@ -165,6 +153,22 @@ def main() -> None:
                 print(f"{OmegaConf.to_yaml(val)}")
             else:
                 print(f"{val}")
+        return
+
+    # edit values
+
+    update_yaml: YamlBlock
+    if argparse_args.file is not None:
+        update_yaml = OmegaConf.load(argparse_args.file)
+    elif argparse_args.dotlist:
+        update_yaml = OmegaConf.from_dotlist(argparse_args.dotlist)
+
+    args = Args(update_yaml=update_yaml, block_id=argparse_args.block_id, yaml_file=argparse_args.file)
+    logger.debug(f"{args=}")
+    yaml_blocks = YamlParser().update(
+        "".join(sys.stdin.readlines()), update_yaml=args.update_yaml, block_id=args.block_id
+    )
+    YamlParser.stdout_yaml(yaml_blocks)
 
 
 if __name__ == "__main__":
