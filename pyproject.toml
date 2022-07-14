@@ -35,7 +35,7 @@ python_files = [
 
 [tool.poetry]
 name = "yaml-pipe"
-version = "1.2.0"
+version = "1.2.1"
 description = "Parse yaml"
 authors = ["pollenjp <polleninjp@gmail.com>"]
 readme = "README.md"
