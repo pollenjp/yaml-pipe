@@ -101,7 +101,7 @@ def get_argparse() -> argparse.Namespace:
         "--block_id",
         type=int,
         default=None,
-        help="Block id started from 0."
+        help="Block id 0 origin (the index is started from 0)."
         'If the input is multi block yaml (separated by "---"), manipulate the block specified by this argument.'
         "All block is manipulated, if not specified.",
     )
