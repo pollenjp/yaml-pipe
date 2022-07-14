@@ -41,8 +41,9 @@ pip install yaml-pipe
 
 ## How to use
 
-- `--dotindex`: extract only now.
-- `--dotlist`: edit only now.
+- `--dotindex`: extract only.
+- `--dotlist`: edit only.
+- `-f, --file`: edit only.
 
 ### Extract Example 1
 
@@ -175,7 +176,7 @@ fizz:
 ```
 
 ```sh
-cat sample.yml | yaml-pipe --block_id 1 --dotlist update.yml
+cat sample.yml | yaml-pipe --block_id 1 --file update.yml
 ```
 
 output
