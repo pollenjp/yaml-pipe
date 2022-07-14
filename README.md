@@ -91,7 +91,7 @@ fizz:
   buzz: buzz
 ```
 
-## Developpers
+## Developers
 
 ### Linting and test
 
