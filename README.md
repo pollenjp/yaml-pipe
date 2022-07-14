@@ -200,6 +200,7 @@ pyenv local 3.10.4 3.9.13 3.8.13
 ```sh
 poetry install
 poetry run nox
+./test_cli.sh
 ```
 
 ### Upload to PyPI
