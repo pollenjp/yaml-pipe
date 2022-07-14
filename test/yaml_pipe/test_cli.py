@@ -93,10 +93,8 @@ foo:
             ),
         ],
     )
-    def test_parse_yaml(self, param: ParseYamlParam) -> None:
-        yaml_blocks: t.List[YamlBlock] = YamlParser.parse_yaml(
-            param.yaml_str, param.update_yaml, block_id=param.block_id
-        )
+    def test_update(self, param: ParseYamlParam) -> None:
+        yaml_blocks: t.List[YamlBlock] = YamlParser().update(param.yaml_str, param.update_yaml, block_id=param.block_id)
         assert len(yaml_blocks) == len(param.ret_val)
         for v1, v2 in zip(yaml_blocks, param.ret_val):
             assert v1, v2

@@ -21,21 +21,27 @@ YamlBlock = t.Union[DictConfig, ListConfig]
 
 
 class YamlParser:
-    def __call__(self, yaml_str: str, update_yaml: YamlBlock, block_id: t.Optional[int] = None) -> None:
-        yaml_blocks: t.List[YamlBlock] = self.parse_yaml(yaml_str, update_yaml, block_id=block_id)
-        self.stdout_yaml(yaml_blocks)
+    def update(self, yaml_str: str, update_yaml: YamlBlock, block_id: t.Optional[int] = None) -> t.List[YamlBlock]:
+        yaml_blocks: t.List[YamlBlock]
+        yaml_blocks = self.parse_yaml(yaml_str)
+        yaml_blocks = self.update_yaml_blocks(yaml_blocks, update_yaml, block_id=block_id)
+        return yaml_blocks
 
     @staticmethod
     def parse_yaml(
         yaml_str: str,
+    ) -> t.List[YamlBlock]:
+        yaml_block: YamlBlock
+        yaml_blocks: t.List[YamlBlock] = [OmegaConf.create(y) for y in yaml.safe_load_all(yaml_str)]
+        return yaml_blocks
+
+    @staticmethod
+    def update_yaml_blocks(
+        yaml_blocks: t.List[YamlBlock],
         update_yaml: YamlBlock,
         *,
         block_id: t.Optional[int] = None,
     ) -> t.List[YamlBlock]:
-        yaml_block: YamlBlock
-        yaml_blocks: t.List[YamlBlock] = []
-        yaml_blocks = [OmegaConf.create(y) for y in yaml.safe_load_all(yaml_str)]
-
         if block_id is not None:
             yaml_blocks[block_id] = OmegaConf.merge(yaml_blocks[block_id], update_yaml)
         else:
@@ -70,9 +76,6 @@ class Args:
 def get_argparse() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Get yaml as stdin and parse it!")
     parser.add_argument(
-        "omegaconf_args", nargs=argparse.REMAINDER, help="dotlist. (ex: 'foo=bar fizz.buzz=\"Hello World!\"' )"
-    )
-    parser.add_argument(
         "--block_id",
         type=int,
         default=None,
@@ -80,7 +83,23 @@ def get_argparse() -> argparse.Namespace:
         'If the input is multi block yaml (separated by "---"), manipulate the block specified by this argument.'
         "All block is manipulated, if not specified.",
     )
-    parser.add_argument("-f", "--file", type=lambda x: Path(x), default=None, help="yaml file")
+    args_group1 = parser.add_mutually_exclusive_group(required=True)
+    args_group1.add_argument("--file", type=lambda x: Path(x), default=None, help="yaml file")
+    args_group1.add_argument(
+        "--py",
+        nargs=argparse.REMAINDER,
+        help=(
+            "Dot and python-list format. e.g. --py 'xxx.yyy[0].zzz: 123'."
+            "Support only view."
+            "If each key has a value, update yaml. Otherwise, read yaml."
+        ),
+    )
+    args_group1.add_argument(
+        "--dotlist",
+        nargs=argparse.REMAINDER,
+        help="dotlist. e.g. 'foo=bar fizz.buzz=\"Hello World!\"'",
+    )
+
     args, unknown = parser.parse_known_args()
 
     if args.file is not None and args.omegaconf_args:
@@ -95,16 +114,46 @@ def main() -> None:
     argparse_args = get_argparse()
 
     update_yaml: YamlBlock
+    yaml_blocks: t.List[YamlBlock]
     if argparse_args.file is not None:
         update_yaml = OmegaConf.load(argparse_args.file)
-    else:
-        update_yaml = OmegaConf.from_dotlist(argparse_args.omegaconf_args)
+    elif argparse_args.dotlist:
+        update_yaml = OmegaConf.from_dotlist(argparse_args.dotlist)
+        args = Args(update_yaml=update_yaml, block_id=argparse_args.block_id, yaml_file=argparse_args.file)
+        logger.debug(f"{args=}")
+        yaml_blocks = YamlParser().update(
+            "".join(sys.stdin.readlines()), update_yaml=args.update_yaml, block_id=args.block_id
+        )
+        YamlParser.stdout_yaml(yaml_blocks)
+    elif argparse_args.py:
+        yaml_blocks = YamlParser.parse_yaml(yaml_str="\n".join(sys.stdin.readlines()))
+        yaml_block: YamlBlock
+        if len(yaml_blocks) == 1:
+            yaml_block = yaml_blocks[0]
+        else:
+            if argparse_args.block_id is None:
+                raise ValueError("Multi block yaml and no block_id specified.")
+            yaml_block = yaml_blocks[argparse_args.block_id]
 
-    args = Args(update_yaml=update_yaml, block_id=argparse_args.block_id, yaml_file=argparse_args.file)
-    logger.debug(f"{args=}")
-
-    yaml_parser = YamlParser()
-    yaml_parser("".join(sys.stdin.readlines()), update_yaml=args.update_yaml, block_id=args.block_id)
+        for kv_str in argparse_args.py:
+            if ":" in kv_str:
+                raise NotImplementedError("Support only view.")
+            else:
+                ks = kv_str.strip()
+                _target = yaml_block
+                k_list = ks.split(".")
+                for k in k_list:
+                    # list parse
+                    k, *tmp = k.split("[")
+                    _target = _target[k]
+                    if len(tmp) > 0:
+                        for i in [int(x[:-1:]) for x in tmp]:  # indices
+                            _target = _target[i]
+                logger.debug(f"{type( _target )=}")
+                if isinstance(_target, (list, dict, DictConfig, ListConfig)):
+                    print(f"{OmegaConf.to_yaml(_target)}")
+                else:
+                    print(f"{_target}")
 
 
 if __name__ == "__main__":
