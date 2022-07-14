@@ -41,7 +41,70 @@ pip install yaml-pipe
 
 ## How to use
 
-### example1
+- `--dotindex`: extract only now.
+- `--dotlist`: edit only now.
+
+### Extract Example 1
+
+```yaml
+---
+aaa:
+  bbb: bbb
+```
+
+```sh
+cat sample.yml | yaml-pipe --dotindex "aaa.bbb"
+```
+
+output
+
+```log
+bbb
+```
+
+### Extract Example 2
+
+```yaml
+---
+aaa:
+  bbb: bbb
+---
+xxx:
+  yyy: yyy
+```
+
+```sh
+cat sample.yml | yaml-pipe --block_id 1 --dotindex "xxx.yyy"
+```
+
+output
+
+```log
+yyy
+```
+
+### Extract Example 3
+
+```yaml
+---
+xxx:
+  yyy:
+    zzz: zzz
+```
+
+```sh
+cat sample.yml | yaml-pipe --block_id 1 --dotindex "xxx"
+```
+
+output
+
+```yaml
+yyy:
+  zzz: zzz
+
+```
+
+### Edit Example 1
 
 `sample.yml`
 
@@ -49,10 +112,10 @@ pip install yaml-pipe
 ---
 foo:
   bar: BAR
-````
+```
 
 ```sh
-cat sample.yml | yaml-pipe foo.bar="bar"
+cat sample.yml | yaml-pipe --dotlist foo.bar="bar"
 ```
 
 output
@@ -63,7 +126,7 @@ foo:
   bar: bar
 ```
 
-### example2
+### Edit Example 2
 
 `sample.yml`
 
@@ -74,10 +137,10 @@ foo:
 ---
 fizz:
   buzz: BUZZ
-````
+```
 
 ```sh
-cat sample.yml | yaml-pipe --block_id 1 fizz.buzz="buzz"
+cat sample.yml | yaml-pipe --block_id 1 --dotlist fizz.buzz="buzz"
 ```
 
 output
@@ -91,7 +154,42 @@ fizz:
   buzz: buzz
 ```
 
-## Developpers
+### example3
+
+`sample.yml`
+
+```yaml
+---
+foo:
+  bar: BAR
+---
+fizz:
+  buzz: BUZZ
+````
+
+`update.yml`
+
+```yml
+fizz:
+  buzz: buzz
+```
+
+```sh
+cat sample.yml | yaml-pipe --block_id 1 --dotlist update.yml
+```
+
+output
+
+```yaml
+---
+foo:
+  bar: BAR
+---
+fizz:
+  buzz: buzz
+```
+
+## Developers
 
 ### Linting and test
 

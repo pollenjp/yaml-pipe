@@ -93,10 +93,86 @@ foo:
             ),
         ],
     )
-    def test_parse_yaml(self, param: ParseYamlParam) -> None:
-        yaml_blocks: t.List[YamlBlock] = YamlParser.parse_yaml(
-            param.yaml_str, param.update_yaml, block_id=param.block_id
-        )
+    def test_update(self, param: ParseYamlParam) -> None:
+        yaml_blocks: t.List[YamlBlock] = YamlParser().update(param.yaml_str, param.update_yaml, block_id=param.block_id)
         assert len(yaml_blocks) == len(param.ret_val)
         for v1, v2 in zip(yaml_blocks, param.ret_val):
             assert v1, v2
+
+    class ParamExtraValue(BaseModel):
+        yaml_block: YamlBlock
+        dot_key: str
+        ret_val: t.Union[int, str, YamlBlock]
+
+        class Config:
+            arbitrary_types_allowed = True
+
+    @pytest.mark.parametrize(
+        "param",
+        [
+            pytest.param(
+                ParamExtraValue(
+                    yaml_block=OmegaConf.create(
+                        """\
+---
+aaa:
+  bbb:
+    ccc: ccc
+"""
+                    ),
+                    dot_key="aaa",
+                    ret_val=OmegaConf.create(
+                        """\
+---
+bbb:
+  ccc: ccc
+"""
+                    ),
+                )
+            ),
+            pytest.param(
+                ParamExtraValue(
+                    yaml_block=OmegaConf.create(
+                        """\
+---
+aaa:
+  bbb:
+    ccc: ccc
+"""
+                    ),
+                    dot_key="aaa.bbb.ccc",
+                    ret_val="ccc",
+                )
+            ),
+            pytest.param(
+                ParamExtraValue(
+                    yaml_block=OmegaConf.create(
+                        """\
+---
+aaa:
+- bbb
+- ccc
+"""
+                    ),
+                    dot_key="aaa[1]",
+                    ret_val="ccc",
+                )
+            ),
+            pytest.param(
+                ParamExtraValue(
+                    yaml_block=OmegaConf.create(
+                        """\
+---
+aaa:
+- bbb:
+    ccc: ccc
+"""
+                    ),
+                    dot_key="aaa[0].bbb.ccc",
+                    ret_val="ccc",
+                )
+            ),
+        ],
+    )
+    def test_extract_value(self, param: ParamExtraValue) -> None:
+        assert YamlParser.extract_value(param.yaml_block, param.dot_key) == param.ret_val
