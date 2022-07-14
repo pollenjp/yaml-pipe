@@ -2,8 +2,10 @@
 import argparse
 import sys
 import typing as t
+from dataclasses import dataclass
 from logging import NullHandler
 from logging import getLogger
+from pathlib import Path
 
 # Third Party Library
 import yaml
@@ -58,9 +60,18 @@ def assert_unknown_args(args: t.List[str]) -> None:
         raise ValueError(f"See --help. Unknown arguments: {unknown_args}")
 
 
-def main() -> None:
+@dataclass
+class Args:
+    update_yaml: YamlBlock
+    block_id: t.Optional[int] = None
+    yaml_file: t.Optional[str] = None
+
+
+def get_argparse() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Get yaml as stdin and parse it!")
-    parser.add_argument("args", nargs=argparse.REMAINDER, help="dotlist. (ex: 'foo=bar fizz.buzz=\"Hello World!\"' )")
+    parser.add_argument(
+        "omegaconf_args", nargs=argparse.REMAINDER, help="dotlist. (ex: 'foo=bar fizz.buzz=\"Hello World!\"' )"
+    )
     parser.add_argument(
         "--block_id",
         type=int,
@@ -69,13 +80,31 @@ def main() -> None:
         'If the input is multi block yaml (separated by "---"), manipulate the block specified by this argument.'
         "All block is manipulated, if not specified.",
     )
+    parser.add_argument("-f", "--file", type=lambda x: Path(x), default=None, help="yaml file")
+    args, unknown = parser.parse_known_args()
 
-    argparse_args, unknown = parser.parse_known_args()
+    if args.file is not None and args.omegaconf_args:
+        raise ValueError("--file and omegaconf_args are exclusive.")
+
     assert_unknown_args(unknown)
-    omegaconf_args: YamlBlock = OmegaConf.from_dotlist(argparse_args.args)
+    return args
+
+
+def main() -> None:
+
+    argparse_args = get_argparse()
+
+    update_yaml: YamlBlock
+    if argparse_args.file is not None:
+        update_yaml = OmegaConf.load(argparse_args.file)
+    else:
+        update_yaml = OmegaConf.from_dotlist(argparse_args.omegaconf_args)
+
+    args = Args(update_yaml=update_yaml, block_id=argparse_args.block_id, yaml_file=argparse_args.file)
+    logger.debug(f"{args=}")
 
     yaml_parser = YamlParser()
-    yaml_parser("".join(sys.stdin.readlines()), update_yaml=omegaconf_args, block_id=argparse_args.block_id)
+    yaml_parser("".join(sys.stdin.readlines()), update_yaml=args.update_yaml, block_id=args.block_id)
 
 
 if __name__ == "__main__":
@@ -84,6 +113,6 @@ if __name__ == "__main__":
 
     logging.basicConfig(
         format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] - %(message)s",
-        level=logging.INFO,
+        level=logging.DEBUG,
     )
     main()
