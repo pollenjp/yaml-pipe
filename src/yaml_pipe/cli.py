@@ -56,6 +56,28 @@ class YamlParser:
             print("---")
             print(OmegaConf.to_yaml(yaml_block))
 
+    @staticmethod
+    def extract_value(
+        yaml_block: YamlBlock,
+        dot_key: str,
+    ) -> YamlBlock:
+        if ":" in dot_key:
+            raise NotImplementedError("Support only view.")
+
+        ks = dot_key.strip()
+        _target: YamlBlock = yaml_block
+        k_list = ks.split(".")
+        for k in k_list:
+            # list parse
+            k, *tmp = k.split("[")
+            if k != "":
+                _target = t.cast(DictConfig, _target)[k]
+            if len(tmp) > 0:
+                for i in [int(x[:-1:]) for x in tmp]:  # indices
+                    _target = _target[i]
+        logger.debug(f"{type( _target )=}")
+        return _target
+
 
 def assert_unknown_args(args: t.List[str]) -> None:
     unknown_args: t.List[str] = []
@@ -89,7 +111,7 @@ def get_argparse() -> argparse.Namespace:
         "--py",
         nargs=argparse.REMAINDER,
         help=(
-            "Dot and python-list format. e.g. --py 'xxx.yyy[0].zzz: 123'."
+            "Dot and list-index format. e.g. --py 'xxx.yyy[0].zzz: 123'."
             "Support only view."
             "If each key has a value, update yaml. Otherwise, read yaml."
         ),
@@ -135,25 +157,14 @@ def main() -> None:
                 raise ValueError("Multi block yaml and no block_id specified.")
             yaml_block = yaml_blocks[argparse_args.block_id]
 
-        for kv_str in argparse_args.py:
-            if ":" in kv_str:
-                raise NotImplementedError("Support only view.")
+        for dot_key in argparse_args.py:
+            val: t.Union[str, int, t.List[t.Any], t.Dict[str, t.Any], YamlBlock] = YamlParser.extract_value(
+                yaml_block, dot_key
+            )
+            if isinstance(val, (list, dict, DictConfig, ListConfig)):
+                print(f"{OmegaConf.to_yaml(val)}")
             else:
-                ks = kv_str.strip()
-                _target = yaml_block
-                k_list = ks.split(".")
-                for k in k_list:
-                    # list parse
-                    k, *tmp = k.split("[")
-                    _target = _target[k]
-                    if len(tmp) > 0:
-                        for i in [int(x[:-1:]) for x in tmp]:  # indices
-                            _target = _target[i]
-                logger.debug(f"{type( _target )=}")
-                if isinstance(_target, (list, dict, DictConfig, ListConfig)):
-                    print(f"{OmegaConf.to_yaml(_target)}")
-                else:
-                    print(f"{_target}")
+                print(f"{val}")
 
 
 if __name__ == "__main__":
