@@ -91,6 +91,41 @@ fizz:
   buzz: buzz
 ```
 
+### example3
+
+`sample.yml`
+
+```yaml
+---
+foo:
+  bar: BAR
+---
+fizz:
+  buzz: BUZZ
+````
+
+`update.yml`
+
+```yml
+fizz:
+  buzz: buzz
+```
+
+```sh
+cat sample.yml | yaml-pipe --block_id 1 -f update.yml
+```
+
+output
+
+```yaml
+---
+foo:
+  bar: BAR
+---
+fizz:
+  buzz: buzz
+```
+
 ## Developers
 
 ### Linting and test
